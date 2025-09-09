@@ -1,0 +1,1 @@
+{\n  "name": "lame",\n  "version": "1.0.0",\n  "scripts": {\n    "dev": "vite dev",\n    "build": "vite build",\n    "preview": "vite preview"\n  },\n  "devDependencies": {\n    "@sveltejs/kit": "next",\n    "svelte": "^4.0.0",\n    "vite": "^4.0.0"\n  }\n}
