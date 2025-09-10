@@ -1,0 +1,21 @@
+/* Pirate palette via CSS variables */
+:root {
+  --pirate-gold: #D4AF37;
+  --pirate-parchment: #F2E8C9;
+  --pirate-muted: #B6A88A;
+}
+
+/* Convenience utilities mapped to CSS vars for Tailwind-ish usage */
+.text-pirate-gold { color: var(--pirate-gold); }
+.text-pirate-parchment { color: var(--pirate-parchment); }
+.text-pirate-muted { color: var(--pirate-muted); }
+.bg-pirate-gold\/90 { background-color: color-mix(in oklab, var(--pirate-gold) 90%, transparent); }
+
+/* Fallback if color-mix unsupported */
+@supports not (background-color: color-mix(in oklab, white, black)) {
+  .bg-pirate-gold\/90 { background-color: #c6a232; }
+}
+
+/* Gothic title keeps the swagger */
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
+.gothic-font { font-family: 'UnifrakturCook', cursive; }

@@ -1,6 +1,6 @@
 <script>
-    import '../app.css';
-  </script>
-  
-  <slot />
-  
+  import '../app.css';
+  import '$lib/styles.css';
+</script>
+
+<slot />

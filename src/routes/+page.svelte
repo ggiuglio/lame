@@ -1,8 +1,9 @@
 <!-- Pirate-styled version (drop-in) -->
 <script lang="ts">
-  // ⬇️ Keep your original script exactly as-is
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
+  import { PeopleTable } from '$lib';
   import { browser } from '$app/environment';
+  import PersonDrawer from '$lib/PersonDrawer.svelte';
 
   type Person = {
     id: string;
@@ -23,19 +24,12 @@
   ];
 
   let people: Person[] = [];
-
-  type DrawerMode = 'create' | 'edit';
   let drawerOpen = false;
-  let drawerMode: DrawerMode = 'create';
-
-  let formName = '';
-  let formDate = '';
-  let formLeg: Person['injuredLeg'] = 'Left';
-  let editingId: string | null = null;
+  let drawerMode: 'create' | 'edit' = 'create';
+  let editingPerson: Person | null = null;
+  let addButtonEl: HTMLButtonElement | null = null;
 
   const STORAGE_KEY = 'people-table-v1';
-  let addButtonEl: HTMLButtonElement | null = null;
-  let firstFieldEl: HTMLInputElement | null = null;
 
   onMount(() => {
     if (browser) {
@@ -60,57 +54,50 @@
 
   function openCreate() {
     drawerMode = 'create';
-    editingId = null;
-    formName = '';
-    formDate = '';
-    formLeg = 'Left';
-    openDrawer();
-  }
-  function openEdit(p: Person) {
-    drawerMode = 'edit';
-    editingId = p.id;
-    formName = p.name;
-    formDate = p.dateOfInjury;
-    formLeg = p.injuredLeg;
-    openDrawer();
-  }
-  async function openDrawer() {
+    editingPerson = null;
     drawerOpen = true;
-    await tick();
-    firstFieldEl?.focus();
   }
+
+  function openEdit(person: Person) {
+    drawerMode = 'edit';
+    editingPerson = person;
+    drawerOpen = true;
+  }
+
   function closeDrawer() {
     drawerOpen = false;
     addButtonEl?.focus();
   }
-  function onKey(e: KeyboardEvent) {
-    if (e.key === 'Escape' && drawerOpen) closeDrawer();
+
+  function handleEdit(e: CustomEvent<Person>) {
+    openEdit(e.detail);
   }
-  function validISODate(s: string) {
-    return /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s));
+
+  function handleRemove(e: CustomEvent<string>) {
+    removePerson(e.detail);
   }
-  function submitForm() {
-    const name = formName.trim();
-    if (!name || !validISODate(formDate)) return;
+
+  function handleSubmit(event: CustomEvent<{ name: string; dateOfInjury: string; injuredLeg: Person['injuredLeg']; id?: string }>) {
+    const { name, dateOfInjury, injuredLeg, id } = event.detail;
+
     if (drawerMode === 'create') {
       people = [
-        { id: uuid(), name, dateOfInjury: formDate, injuredLeg: formLeg },
+        { id: uuid(), name, dateOfInjury, injuredLeg },
         ...people
       ].sort((a, b) => (a.dateOfInjury < b.dateOfInjury ? 1 : -1));
-    } else if (drawerMode === 'edit' && editingId) {
-      const idx = people.findIndex((p) => p.id === editingId);
+    } else if (drawerMode === 'edit' && id) {
+      const idx = people.findIndex((p) => p.id === id);
       if (idx !== -1) {
         const next = [...people];
-        next[idx] = { ...people[idx], name, dateOfInjury: formDate, injuredLeg: formLeg };
+        next[idx] = { ...people[idx], name, dateOfInjury, injuredLeg };
         people = next.sort((a, b) => (a.dateOfInjury < b.dateOfInjury ? 1 : -1));
       }
     }
-    closeDrawer();
   }
   function removePerson(id: string) {
     if (!confirm('Remove this entry?')) return;
     people = people.filter((p) => p.id !== id);
-    if (editingId === id) closeDrawer();
+    if (editingPerson?.id === id) closeDrawer();
   }
   function formatDate(iso: string) {
     try {
@@ -119,7 +106,6 @@
   }
 </script>
 
-<svelte:window on:keydown={onKey} />
 
 <!-- Full page -->
 <div class="pirate-bg min-h-screen w-full text-[#E9E2D0] flex flex-col relative overflow-hidden">
@@ -150,175 +136,28 @@
     <h3 class="text-xl md:text-xl font-bold text-pirate-gold tracking-wide gothic-font">
       Your Lames
     </h3>
-    <div class="h-full overflow-auto rounded-xl border border-[#0C1A22] bg-[#0E1F29]/60 backdrop-blur-sm shadow-inner shadow-black/40">
-      <table class="min-w-full text-sm text-left">
-        <thead class="sticky top-0 z-10 bg-[#3B0A0A] text-pirate-parchment uppercase tracking-wide">
-          <tr class="[&>th]:px-4 [&>th]:py-3">
-            <th>Name</th>
-            <th>Date of Injury</th>
-            <th>Injured Leg</th>
-            <th class="w-44">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#if people.length === 0}
-            <tr class="bg-[#0B1720]">
-              <td colspan="4" class="px-4 py-8 text-center text-pirate-muted">
-                No entries yet.
-                <button class="ml-2 underline text-pirate-gold hover:text-[#F6E6A3]" on:click={openCreate}>Create one</button>
-              </td>
-            </tr>
-          {/if}
-
-          {#each people as person, i (person.id)}
-            <tr class={i % 2 === 0 ? 'bg-[#0B1720]/80' : 'bg-[#102532]/80'}>
-              <td class="px-4 py-3">{person.name}</td>
-              <td class="px-4 py-3">{formatDate(person.dateOfInjury)}</td>
-              <td class="px-4 py-3">{person.injuredLeg}</td>
-              <td class="px-4 py-3 space-x-2">
-                <button
-                  class="rounded-lg px-3 py-1 bg-pirate-gold/90 hover:bg-pirate-gold text-[#1B2A34] transition shadow shadow-black/40"
-                  on:click={() => openEdit(person)}
-                >Edit</button>
-                <button
-                  class="rounded-lg px-3 py-1 bg-[#7A0000] hover:bg-[#9D0B0B] text-pirate-parchment transition shadow shadow-black/40"
-                  on:click={() => removePerson(person.id)}
-                >Remove</button>
-              </td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
+    <PeopleTable
+      {people}
+      on:create={openCreate}
+      on:edit={handleEdit}
+      on:remove={handleRemove}
+    />
   </div>
 
-  <!-- Backdrop -->
-  {#if drawerOpen}
-    <div
-      class="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-40"
-      on:click={closeDrawer}
-      aria-hidden="true"
-    />
-  {/if}
 
-  <!-- Right Drawer -->
-  <aside
-    id="person-drawer"
-    class="fixed right-0 top-0 h-full w-full sm:w-[420px] max-w-full z-50 transform transition-transform duration-300
-           bg-[#0E1F29] border-l border-[#0C1A22] flex flex-col shadow-2xl shadow-black/50"
-    style:transform={drawerOpen ? 'translateX(0)' : 'translateX(100%)'}
-    aria-modal="true"
-    role="dialog"
-    aria-labelledby="drawer-title"
-  >
-    <!-- Drawer header -->
-    <div class="p-4 border-b border-[#0C1A22] flex items-center justify-between bg-[#0B1720]">
-      <h2 id="drawer-title" class="text-lg font-semibold text-pirate-gold">
-        {drawerMode === 'create' ? 'Add person' : 'Edit person'}
-      </h2>
-      <button
-        class="rounded-lg px-2 py-1 bg-[#142833] hover:bg-[#1A3240] text-pirate-parchment"
-        on:click={closeDrawer}
-        aria-label="Close drawer"
-      >✕</button>
-    </div>
-
-    <!-- Drawer content -->
-    <form class="p-4 space-y-4 overflow-auto flex-1" on:submit|preventDefault={submitForm}>
-      <div>
-        <label class="block text-sm font-medium text-pirate-parchment/90" for="name">Name</label>
-        <input
-          id="name"
-          class="mt-1 block w-full rounded-xl border border-[#1C2F3A] bg-[#0B1720] text-[#E9E2D0] px-3 py-2
-                 focus:outline-none focus:ring-2 focus:ring-pirate-gold/60"
-          bind:this={firstFieldEl}
-          bind:value={formName}
-          required
-          minlength="2"
-          placeholder="Full name"
-        />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-pirate-parchment/90" for="doi">Date of injury</label>
-        <input
-          id="doi"
-          type="date"
-          class="mt-1 block w-full rounded-xl border border-[#1C2F3A] bg-[#0B1720] text-[#E9E2D0] px-3 py-2
-                 focus:outline-none focus:ring-2 focus:ring-pirate-gold/60"
-          bind:value={formDate}
-          required
-        />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-pirate-parchment/90" for="leg">Lame leg</label>
-        <select
-          id="leg"
-          class="mt-1 block w-full rounded-xl border border-[#1C2F3A] bg-[#0B1720] text-[#E9E2D0] px-3 py-2
-                 focus:outline-none focus:ring-2 focus:ring-pirate-gold/60"
-          bind:value={formLeg}
-        >
-          <option>Left</option>
-          <option>Right</option>
-          <option>Both</option>
-          <option>Other</option>
-        </select>
-      </div>
-
-      <div class="pt-2 flex gap-2">
-        <button
-          type="submit"
-          class="rounded-xl px-4 py-2 font-semibold bg-pirate-gold/90 hover:bg-pirate-gold text-[#1B2A34] transition shadow-lg shadow-black/30"
-          disabled={!formName.trim() || !validISODate(formDate)}
-        >
-          {drawerMode === 'create' ? 'Add Lame' : 'Save changes'}
-        </button>
-        <button
-          type="button"
-          on:click={closeDrawer}
-          class="rounded-xl px-4 py-2 font-medium bg-[#142833] hover:bg-[#1A3240] text-pirate-parchment transition"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
-
-    <div class="p-4 text-[11px] text-pirate-muted border-t border-[#0C1A22] bg-[#0B1720]">
-      Press <span class="px-1 rounded bg-[#142833] text-pirate-parchment">Esc</span> to close
-    </div>
-  </aside>
+  <PersonDrawer
+    open={drawerOpen}
+    mode={drawerMode}
+    editingPerson={editingPerson}
+    on:close={closeDrawer}
+    on:submit={handleSubmit}
+  />
 </div>
 
 <style>
-  /* Pirate palette via CSS variables */
-  :root {
-    --pirate-gold: #D4AF37;
-    --pirate-parchment: #F2E8C9;
-    --pirate-muted: #B6A88A;
-  }
-  .text-pirate-gold { color: var(--pirate-gold); }
-  .bg-pirate-gold { background-color: var(--pirate-gold); }
-  .text-pirate-parchment { color: var(--pirate-parchment); }
-  .text-pirate-muted { color: var(--pirate-muted); }
-
   /* Background: stormy sea + subtle flag watermark */
   .pirate-bg {
     background: linear-gradient(180deg, #06131A 0%, #091E26 40%, #0B1720 100%);
     position: relative;
-  }
-
-  /* Gothic title keeps the swagger */
-  @import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
-  .gothic-font { font-family: 'UnifrakturCook', cursive; }
-
-  /* Convenience utilities mapped to CSS vars for Tailwind-ish usage */
-  .text-pirate-gold { color: var(--pirate-gold); }
-  .bg-pirate-gold\/90 { background-color: color-mix(in oklab, var(--pirate-gold) 90%, transparent); }
-  .text-pirate-parchment { color: var(--pirate-parchment); }
-  .text-pirate-muted { color: var(--pirate-muted); }
-  /* Fallback if color-mix unsupported */
-  @supports not (background-color: color-mix(in oklab, white, black)) {
-    .bg-pirate-gold\/90 { background-color: #c6a232; }
   }
 </style>
