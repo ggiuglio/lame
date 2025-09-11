@@ -2,55 +2,25 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { PeopleTable } from '$lib';
+  import { goto } from '$app/navigation';
   import { browser } from '$app/environment';
+  import { people } from '$lib/stores';
+  import type { Person } from '$lib/stores';
   import PersonDrawer from '$lib/PersonDrawer.svelte';
 
-  type Person = {
-    id: string;
-    name: string;
-    dateOfInjury: string; // ISO yyyy-mm-dd
-    injuredLeg: 'Left' | 'Right' | 'Both' | 'Other';
-  };
 
-  const uuid = () =>
-    typeof crypto !== 'undefined' && 'randomUUID' in crypto
-      ? crypto.randomUUID()
-      : `id_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-
-  export let initialPeople: Person[] = [
-    { id: 'p1', name: 'Alice Johnson', dateOfInjury: '2022-04-15', injuredLeg: 'Left' },
-    { id: 'p2', name: 'Brian Smith',  dateOfInjury: '2021-11-30', injuredLeg: 'Right' },
-    { id: 'p3', name: 'Carla Brown',  dateOfInjury: '2020-07-10', injuredLeg: 'Left' }
-  ];
-
-  let people: Person[] = [];
   let drawerOpen = false;
   let drawerMode: 'create' | 'edit' = 'create';
   let editingPerson: Person | null = null;
   let addButtonEl: HTMLButtonElement | null = null;
 
-  const STORAGE_KEY = 'people-table-v1';
+  let sortedPeople: Person[] = [];
 
   onMount(() => {
-    if (browser) {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        people = raw ? (JSON.parse(raw) as Person[]) : initialPeople;
-      } catch {
-        people = initialPeople;
-      }
-    } else {
-      people = initialPeople;
-    }
+    people.load();
   });
 
-  let persistTimer: ReturnType<typeof setTimeout> | null = null;
-  $: if (browser) {
-    if (persistTimer) clearTimeout(persistTimer);
-    persistTimer = setTimeout(() => {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(people)); } catch {}
-    }, 120);
-  }
+  $: sortedPeople = $people.data ? [...$people.data].sort((a, b) => a.dateOfInjury < b.dateOfInjury ? 1 : -1) : [];
 
   function openCreate() {
     drawerMode = 'create';
@@ -69,40 +39,23 @@
     addButtonEl?.focus();
   }
 
+  function handleSubmit(event: CustomEvent<{ name: string; dateOfInjury: string; injuredLeg: Person['injuredLeg']; id?: string }>) {
+    const { name, dateOfInjury, injuredLeg, id } = event.detail;
+
+    if (drawerMode === 'create') {
+      people.add({ name, dateOfInjury, injuredLeg });
+    } else if (drawerMode === 'edit' && id) {
+      people.update(id, { name, dateOfInjury, injuredLeg });
+    }
+    closeDrawer();
+  }
+
   function handleEdit(e: CustomEvent<Person>) {
     openEdit(e.detail);
   }
 
   function handleRemove(e: CustomEvent<string>) {
-    removePerson(e.detail);
-  }
-
-  function handleSubmit(event: CustomEvent<{ name: string; dateOfInjury: string; injuredLeg: Person['injuredLeg']; id?: string }>) {
-    const { name, dateOfInjury, injuredLeg, id } = event.detail;
-
-    if (drawerMode === 'create') {
-      people = [
-        { id: uuid(), name, dateOfInjury, injuredLeg },
-        ...people
-      ].sort((a, b) => (a.dateOfInjury < b.dateOfInjury ? 1 : -1));
-    } else if (drawerMode === 'edit' && id) {
-      const idx = people.findIndex((p) => p.id === id);
-      if (idx !== -1) {
-        const next = [...people];
-        next[idx] = { ...people[idx], name, dateOfInjury, injuredLeg };
-        people = next.sort((a, b) => (a.dateOfInjury < b.dateOfInjury ? 1 : -1));
-      }
-    }
-  }
-  function removePerson(id: string) {
-    if (!confirm('Remove this entry?')) return;
-    people = people.filter((p) => p.id !== id);
-    if (editingPerson?.id === id) closeDrawer();
-  }
-  function formatDate(iso: string) {
-    try {
-      return new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(iso));
-    } catch { return iso; }
+    people.remove(e.detail);
   }
 </script>
 
@@ -121,11 +74,11 @@
   <div class="px-8 pb-4 flex justify-end">
     <button
       bind:this={addButtonEl}
-      class="rounded-xl px-4 py-2 font-semibold bg-pirate-gold/90 hover:bg-pirate-gold text-[#1B2A34] transition shadow-lg shadow-black/30 ring-1 ring-black/40"
-      on:click={openCreate}
-      aria-label="Add person"
+      class="rounded-xl px-4 py-2 font-semibold bg-pirate-gold/90 hover:bg-pirate-gold text-[#1B2A34] transition shadow-lg shadow-black/30 ring-1 ring-black/40 focus:outline-none focus:ring-2 focus:ring-pirate-gold/60 focus:ring-offset-2 focus:ring-offset-[#06131A]"
       aria-controls="person-drawer"
       aria-expanded={drawerOpen}
+      on:click={openCreate}
+      aria-label="Add person"
     >
       Add a Lame
     </button>
@@ -137,22 +90,23 @@
       Your Lames
     </h3>
     <PeopleTable
-      {people}
+      people={sortedPeople}
+      loading={$people.loading}
+      error={$people.error}
       on:create={openCreate}
       on:edit={handleEdit}
       on:remove={handleRemove}
     />
   </div>
-
-
-  <PersonDrawer
-    open={drawerOpen}
-    mode={drawerMode}
-    editingPerson={editingPerson}
-    on:close={closeDrawer}
-    on:submit={handleSubmit}
-  />
 </div>
+
+<PersonDrawer
+  open={drawerOpen}
+  mode={drawerMode}
+  editingPerson={editingPerson}
+  on:close={closeDrawer}
+  on:submit={handleSubmit}
+/>
 
 <style>
   /* Background: stormy sea + subtle flag watermark */
