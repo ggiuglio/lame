@@ -44,9 +44,13 @@
 
   $: daysInMonth = getDaysInMonth(year, month);
   $: firstDayOfMonth = getFirstDayOfMonth(year, month);
+  function formatDate(year: number, month: number, day: number) {
+    return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+
   function getAppointmentsForDay(day: number) {
     if (!day) return [];
-    const date = new Date(year, month, day).toISOString().split('T')[0];
+    const date = formatDate(year, month, day);
     return $appointments.filter(a => a.date === date);
   }
 
@@ -119,7 +123,7 @@
           {#each calendarDays as day}
             {#if day !== null}
               <button 
-                class="aspect-square p-1 rounded-lg {isToday(day) ? 'bg-[#142833] ring-2 ring-pirate-gold' : 'bg-[#142833]/50'} hover:bg-[#1A3240] text-pirate-parchment transition flex flex-col items-center justify-center relative focus:outline-none focus:ring-2 focus:ring-pirate-gold/60"
+                class="aspect-square p-2 rounded-lg {isToday(day) ? 'bg-[#142833] ring-2 ring-pirate-gold' : 'bg-[#142833]/50'} hover:bg-[#1A3240] text-pirate-parchment transition flex flex-col relative focus:outline-none focus:ring-2 focus:ring-pirate-gold/60"
                 on:click={() => handleDayClick(day)}
                 tabindex="0"
                 on:keydown={e => {
@@ -129,26 +133,24 @@
                   }
                 }}
               >
-                <span>{day}</span>
+                <span class="text-sm font-medium">{day}</span>
                 {#if getAppointmentsForDay(day).length > 0}
-                  <div class="absolute bottom-1 flex gap-0.5 group">
-                    {#if getAppointmentsForDay(day).length > 1}
-                      <div class="absolute -right-2 -top-2 bg-pirate-gold text-[#091E26] text-[0.6rem] font-medium w-4 h-4 flex items-center justify-center rounded-full shadow-sm shadow-black/50 ring-1 ring-[#091E26]/20">{getAppointmentsForDay(day).length}</div>
-                    {/if}
-                    {#each [...getAppointmentsForDay(day)].sort((a, b) => {
-            const dateCompare = a.date.localeCompare(b.date);
-            if (dateCompare !== 0) return dateCompare;
-            return a.time.localeCompare(b.time);
-          }) as appointment}
-                      <div class="relative">
-                        <div class="h-1 w-1 rounded-full bg-pirate-gold"></div>
-                        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-48 bg-[#091E26] border border-[#1C2F3A] rounded-lg p-2 text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 delay-150 shadow-lg shadow-black/50">
-                          <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#091E26] border-b border-r border-[#1C2F3A] rotate-45"></div>
+                  <div class="mt-1 flex flex-col gap-1 text-[0.7rem] leading-tight">
+                    {#each [...getAppointmentsForDay(day)].sort((a, b) => a.time.localeCompare(b.time)).slice(0, 3) as appointment}
+                      <div class="flex items-center gap-1 group relative">
+                        <div class="w-1 h-1 rounded-full bg-pirate-gold flex-shrink-0"></div>
+                        <div class="truncate text-pirate-parchment/90">{appointment.time.split(':')[0]}:00 {appointment.visitorName}</div>
+                        
+                        <!-- Tooltip -->
+                        <div class="absolute bottom-full left-0 mb-1 w-48 bg-[#091E26] border border-[#1C2F3A] rounded-lg p-2 text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 shadow-lg shadow-black/50">
                           <div class="font-medium">{appointment.visitorName}</div>
-                          <div class="text-pirate-parchment/70">{appointment.time}</div>
+                          <div class="text-pirate-parchment/70">{appointment.time} - {`${((parseInt(appointment.time.split(':')[0]) + 1) % 24).toString().padStart(2, '0')}:00`}</div>
                         </div>
                       </div>
                     {/each}
+                    {#if getAppointmentsForDay(day).length > 3}
+                      <div class="text-pirate-gold/90 text-center text-[0.65rem]">+{getAppointmentsForDay(day).length - 3} more</div>
+                    {/if}
                   </div>
                 {/if}
               </button>
@@ -173,7 +175,7 @@
               <div>
                 <div class="text-pirate-parchment font-medium">{appointment.visitorName}</div>
                 <div class="text-sm text-pirate-parchment/70">
-                  {new Date(appointment.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {appointment.time}
+                  {new Date(appointment.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {appointment.time} - {`${((parseInt(appointment.time.split(':')[0]) + 1) % 24).toString().padStart(2, '0')}:00`}
                 </div>
               </div>
               <button 
@@ -190,8 +192,8 @@
               </button>
             </div>
           {:else}
-            <div class="text-center text-pirate-parchment/70 py-4">
-              No appointments scheduled
+            <div class="text-center text-pirate-gold py-4 text-lg">
+              Your Lame is completely free today
             </div>
           {/each}
         </div>
@@ -214,11 +216,14 @@
   on:close={() => appointmentDrawerOpen = false}
   on:save={({ detail: { visitorName, time } }) => {
     if (!selectedDate) return;
-    appointments.add({
-      date: selectedDate.toISOString().split('T')[0],
+    const date = formatDate(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+    const success = appointments.add({
+      date,
       visitorName,
       time
     });
-    appointmentDrawerOpen = false;
+    if (success) {
+      appointmentDrawerOpen = false;
+    }
   }}
 />
