@@ -177,23 +177,8 @@
       {#if people.length === 0}
         <tr class="bg-[#0B1720]">
           <td colspan="4" class="px-4 py-12 text-center">
-            <div class="flex flex-col items-center gap-4">
-              <img src="/images/jolly roger 3.png" alt="Empty state" class="w-24 h-24 opacity-25" />
-              <div class="text-pirate-muted">
-                No lames in your crew yet.
-                <button 
-                  class="ml-2 underline text-pirate-gold hover:text-[#F6E6A3] focus:outline-none focus:ring-2 focus:ring-pirate-gold/60 rounded" 
-                  on:click={handleCreate}
-                  tabindex="0"
-                  aria-label="Add your first mate"
-                  on:keydown={e => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleCreate();
-                    }
-                  }}
-                >Add your first mate</button>
-              </div>
+            <div class="text-pirate-gold text-lg gothic-font tracking-wide">
+              No Lames today, but just wait the crocodiles' season is about to start!
             </div>
           </td>
         </tr>

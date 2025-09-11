@@ -3,6 +3,7 @@
   import type { Person } from '$lib/stores';
   import { appointments, type Appointment } from '$lib/stores/appointments';
   import AppointmentDrawer from '$lib/AppointmentDrawer.svelte';
+  import CalendarTile from '$lib/CalendarTile.svelte';
 
   export let data: { person?: Person };
 
@@ -14,6 +15,7 @@
 
   function handleDayClick(day: number) {
     selectedDate = new Date(year, month, day);
+    console.log('Selected date:', selectedDate, 'year:', year, 'month:', month, 'day:', day);
     appointmentDrawerOpen = true;
   }
   $: year = currentDate.getFullYear();
@@ -44,14 +46,20 @@
 
   $: daysInMonth = getDaysInMonth(year, month);
   $: firstDayOfMonth = getFirstDayOfMonth(year, month);
-  function formatDate(year: number, month: number, day: number) {
-    return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  function formatDate(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
+  function formatTimeRange(time: string): string {
+    const startHour = time.split(':')[0];
+    const endHour = ((parseInt(startHour) + 1) % 24).toString().padStart(2, '0');
+    return `${time} - ${endHour}:00`;
   }
 
   function getAppointmentsForDay(day: number) {
     if (!day) return [];
-    const date = formatDate(year, month, day);
-    return $appointments.filter(a => a.date === date);
+    const date = formatDate(new Date(year, month, day));
+    return $appointments.filter(a => a.date === date).sort((a, b) => a.time.localeCompare(b.time));
   }
 
   $: calendarDays = Array(42).fill(null).map((_, i) => {
@@ -68,10 +76,9 @@
         on:click={() => goto('/')}
       >← Back</button>
     </div>
-    <h1 class="text-5xl md:text-6xl font-bold text-pirate-gold tracking-wide gothic-font drop-shadow-[0_2px_0_rgba(0,0,0,0.6)]">
+    <h1 class="text-5xl md:text-6xl font-bold text-pirate-gold tracking-wide gothic-font drop-shadow-[0_2px_0_rgba(0,0,0,0.6)] mb-8">
       My Lame {data.person?.name || ''} Appointments
     </h1>
-    <img src="/images/jolly roger 4.png" alt="Jolly Roger" class="w-52 h-52 mx-auto mt-8 mb-6 opacity-45 drop-shadow-[0_4px_12px_rgba(212,175,55,0.15)]" />
   </header>
 
   <!-- Calendar Section -->
@@ -120,40 +127,15 @@
 
         <!-- Calendar Days -->
         <div class="grid grid-cols-7 gap-1">
-          {#each calendarDays as day}
+          {#each calendarDays as day, i}
             {#if day !== null}
-              <button 
-                class="aspect-square p-2 rounded-lg {isToday(day) ? 'bg-[#142833] ring-2 ring-pirate-gold' : 'bg-[#142833]/50'} hover:bg-[#1A3240] text-pirate-parchment transition flex flex-col relative focus:outline-none focus:ring-2 focus:ring-pirate-gold/60"
-                on:click={() => handleDayClick(day)}
-                tabindex="0"
-                on:keydown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleDayClick(day);
-                  }
-                }}
-              >
-                <span class="text-sm font-medium">{day}</span>
-                {#if getAppointmentsForDay(day).length > 0}
-                  <div class="mt-1 flex flex-col gap-1 text-[0.7rem] leading-tight">
-                    {#each [...getAppointmentsForDay(day)].sort((a, b) => a.time.localeCompare(b.time)).slice(0, 3) as appointment}
-                      <div class="flex items-center gap-1 group relative">
-                        <div class="w-1 h-1 rounded-full bg-pirate-gold flex-shrink-0"></div>
-                        <div class="truncate text-pirate-parchment/90">{appointment.time.split(':')[0]}:00 {appointment.visitorName}</div>
-                        
-                        <!-- Tooltip -->
-                        <div class="absolute bottom-full left-0 mb-1 w-48 bg-[#091E26] border border-[#1C2F3A] rounded-lg p-2 text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 shadow-lg shadow-black/50">
-                          <div class="font-medium">{appointment.visitorName}</div>
-                          <div class="text-pirate-parchment/70">{appointment.time} - {`${((parseInt(appointment.time.split(':')[0]) + 1) % 24).toString().padStart(2, '0')}:00`}</div>
-                        </div>
-                      </div>
-                    {/each}
-                    {#if getAppointmentsForDay(day).length > 3}
-                      <div class="text-pirate-gold/90 text-center text-[0.65rem]">+{getAppointmentsForDay(day).length - 3} more</div>
-                    {/if}
-                  </div>
-                {/if}
-              </button>
+              <CalendarTile
+                {day}
+                {year}
+                {month}
+                isToday={isToday(day)}
+                onClick={() => handleDayClick(day)}
+              />
             {:else}
               <div class="aspect-square p-1 rounded-lg bg-[#142833]/20 text-pirate-parchment/30 flex items-center justify-center">
                 <span>·</span>
@@ -175,7 +157,7 @@
               <div>
                 <div class="text-pirate-parchment font-medium">{appointment.visitorName}</div>
                 <div class="text-sm text-pirate-parchment/70">
-                  {new Date(appointment.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {appointment.time} - {`${((parseInt(appointment.time.split(':')[0]) + 1) % 24).toString().padStart(2, '0')}:00`}
+                  {new Date(appointment.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {formatTimeRange(appointment.time)}
                 </div>
               </div>
               <button 
@@ -192,7 +174,7 @@
               </button>
             </div>
           {:else}
-            <div class="text-center text-pirate-gold py-4 text-lg">
+            <div class="text-center text-pirate-gold py-4 text-lg gothic-font tracking-wide">
               Your Lame is completely free today
             </div>
           {/each}
@@ -216,7 +198,7 @@
   on:close={() => appointmentDrawerOpen = false}
   on:save={({ detail: { visitorName, time } }) => {
     if (!selectedDate) return;
-    const date = formatDate(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+    const date = formatDate(selectedDate);
     const success = appointments.add({
       date,
       visitorName,
