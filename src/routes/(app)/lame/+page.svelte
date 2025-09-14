@@ -5,7 +5,15 @@
   import AppointmentDrawer from '$lib/AppointmentDrawer.svelte';
   import CalendarTile from '$lib/CalendarTile.svelte';
 
-  export let data: { person?: Person };
+  import { page } from '$app/stores';
+  import { people } from '$lib/stores';
+  
+  let person: Person | null = null;
+  
+  $: if ($page.url.searchParams.get('id') && $people.data) {
+    const personId = $page.url.searchParams.get('id');
+    person = $people.data.find(p => p.id === personId) || null;
+  }
 
   const today = new Date(2025, 8, 11); // September 11, 2025
   let currentDate = new Date(2025, 8, 1); // September 2025
@@ -77,7 +85,7 @@
       >← Back</button>
     </div>
     <h1 class="text-5xl md:text-6xl font-bold text-pirate-gold tracking-wide gothic-font drop-shadow-[0_2px_0_rgba(0,0,0,0.6)] mb-8">
-      My Lame {data.person?.name || ''} Appointments
+      My Lame {person?.name || ''} Appointments
     </h1>
   </header>
 

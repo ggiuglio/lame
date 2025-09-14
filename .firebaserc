@@ -1,5 +1,16 @@
 {
   "projects": {
-    "default": "book-a-la"
-  }
+    "default": "book-a-lame",
+    "book-a-lame": "book-a-la"
+  },
+  "targets": {
+    "book-a-la": {
+      "hosting": {
+        "book-a-lame": [
+          "book-a-lame"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

@@ -48,9 +48,6 @@
 
   // Ensure navigation works reliably in SPA: use relative internal route
   function navigateTo(personId: string) {
-    console.log("lame" + personId)
-    alert("lame" +  personId)
-
     goto(`/lame?id=${personId}`);
   }
 

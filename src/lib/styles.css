@@ -1,3 +1,6 @@
+/* Gothic title keeps the swagger */
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -21,6 +24,4 @@
   .bg-pirate-gold\/90 { background-color: #c6a232; }
 }
 
-/* Gothic title keeps the swagger */
-@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
 .gothic-font { font-family: 'UnifrakturCook', cursive; }
