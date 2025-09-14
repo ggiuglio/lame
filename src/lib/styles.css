@@ -1,3 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 /* Pirate palette via CSS variables */
 :root {
   --pirate-gold: #D4AF37;
