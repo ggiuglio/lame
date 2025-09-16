@@ -9,7 +9,7 @@ yarn.lock
 pnpm-lock.yaml
 
 # SvelteKit build output
-.build
+/build
 .svelte-kit
 /.vercel
 /.netlify
