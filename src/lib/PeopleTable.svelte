@@ -51,6 +51,10 @@
     goto(`/lame?id=${personId}`);
   }
 
+  function navigateToDnd(personId: string) {
+    goto(`/diendi?id=${personId}`);
+  }
+
   function formatDate(iso: string) {
     try {
       return new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(iso));
@@ -82,8 +86,9 @@
               <div class="h-4 w-16 bg-[#142833] rounded animate-pulse"></div>
             </td>
             <td class="px-4 py-3 space-x-2">
-              <div class="inline-block h-8 w-14 bg-[#142833] rounded-lg animate-pulse"></div>
-              <div class="inline-block h-8 w-20 bg-[#142833] rounded-lg animate-pulse"></div>
+              <div class="inline-block h-8 w-10 bg-[#142833] rounded-lg animate-pulse"></div>
+              <div class="inline-block h-8 w-10 bg-[#142833] rounded-lg animate-pulse"></div>
+              <div class="inline-block h-8 w-10 bg-[#142833] rounded-lg animate-pulse"></div>
             </td>
           </tr>
         {/each}
@@ -191,10 +196,7 @@
 
       {#each sortedPeople as person, i (person.id)}
         <tr 
-          class={`${i % 2 === 0 ? 'bg-[#0B1720]/80' : 'bg-[#102532]/80'} cursor-pointer focus:outline-none focus:ring-2 focus:ring-pirate-gold/20 hover:bg-[#142833]`}
-          on:click={() => navigateTo(person.id)}
-          tabindex="0"
-          on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigateTo(person.id); } }}
+          class={`${i % 2 === 0 ? 'bg-[#0B1720]/80' : 'bg-[#102532]/80'}`}
         >
           <td class="px-4 py-3">
             <div class="block w-full h-full focus:outline-none">
@@ -212,6 +214,12 @@
             </div>
           </td>
           <td class="px-4 py-3 space-x-2 whitespace-nowrap">
+            <button
+              class="rounded-lg overflow-hidden hover:opacity-80 transition focus:outline-none focus:ring-2 focus:ring-purple-600/60 focus:ring-offset-2 focus:ring-offset-[#0B1720] w-12 h-6"
+              on:click|stopPropagation={() => navigateToDnd(person.id)}
+              aria-label="Play D&D">
+              <img src="/images/dnd2.png" alt="D&D" class="w-full h-full object-cover" />
+            </button>
             <button
               class="rounded-lg p-2 bg-pirate-gold/90 hover:bg-pirate-gold text-[#1B2A34] transition shadow shadow-black/40 focus:outline-none focus:ring-2 focus:ring-pirate-gold/60 focus:ring-offset-2 focus:ring-offset-[#0B1720]"
               on:click|stopPropagation={() => handleEdit(person)}

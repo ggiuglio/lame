@@ -39,13 +39,13 @@
     addButtonEl?.focus();
   }
 
-  function handleSubmit(event: CustomEvent<{ name: string; dateOfInjury: string; injuredLeg: Person['injuredLeg']; id?: string }>) {
-    const { name, dateOfInjury, injuredLeg, id } = event.detail;
+  function handleSubmit(event: CustomEvent<{ name: string; dateOfInjury: string; injuredLeg: Person['injuredLeg']; friends: string[]; id?: string }>) {
+    const { name, dateOfInjury, injuredLeg, friends, id } = event.detail;
 
     if (drawerMode === 'create') {
-      people.add({ name, dateOfInjury, injuredLeg });
+      people.add({ name, dateOfInjury, injuredLeg, friends });
     } else if (drawerMode === 'edit' && id) {
-      people.update(id, { name, dateOfInjury, injuredLeg });
+      people.update(id, { name, dateOfInjury, injuredLeg, friends });
     }
     closeDrawer();
   }

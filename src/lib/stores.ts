@@ -7,6 +7,7 @@ export type Person = {
   name: string;
   dateOfInjury: string;
   injuredLeg: 'Left' | 'Right' | 'Both' | 'Other';
+  friends?: string[];
 };
 
 function createPeopleStore() {

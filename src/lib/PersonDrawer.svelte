@@ -9,17 +9,21 @@
     name: string;
     dateOfInjury: string;
     injuredLeg: 'Left' | 'Right' | 'Both' | 'Other';
+    friends?: string[];
   } | null = null;
 
   let formName = '';
   let formDate = '';
   let formLeg: 'Left' | 'Right' | 'Both' | 'Other' = 'Left';
+  let formFriends: string[] = [];
+  let newFriendName = '';
   let firstFieldEl: HTMLInputElement | null = null;
 
   $: if (editingPerson && mode === 'edit') {
     formName = editingPerson.name;
     formDate = editingPerson.dateOfInjury;
     formLeg = editingPerson.injuredLeg;
+    formFriends = editingPerson.friends || [];
   }
 
   function validISODate(s: string) {
@@ -30,6 +34,8 @@
     formName = '';
     formDate = '';
     formLeg = 'Left';
+    formFriends = [];
+    newFriendName = '';
     dispatch('close');
   }
 
@@ -41,13 +47,28 @@
       name,
       dateOfInjury: formDate,
       injuredLeg: formLeg,
+      friends: formFriends,
       id: editingPerson?.id
     });
 
     formName = '';
     formDate = '';
     formLeg = 'Left';
+    formFriends = [];
+    newFriendName = '';
     close();
+  }
+
+  function addFriend() {
+    const friendName = newFriendName.trim();
+    if (friendName && !formFriends.includes(friendName)) {
+      formFriends = [...formFriends, friendName];
+      newFriendName = '';
+    }
+  }
+
+  function removeFriend(friendName: string) {
+    formFriends = formFriends.filter(f => f !== friendName);
   }
 </script>
 
@@ -126,6 +147,47 @@
             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
           </svg>
         </div>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-pirate-gold" for="friends">Friends</label>
+      <div class="mt-1 space-y-2">
+        <div class="flex gap-2">
+          <input
+            id="friends"
+            type="text"
+            class="flex-1 rounded-xl border border-white/10 bg-black/25 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pirate-gold/60"
+            bind:value={newFriendName}
+            on:keydown={(e) => e.key === 'Enter' && (e.preventDefault(), addFriend())}
+            placeholder="Add a friend"
+          />
+          <button
+            type="button"
+            on:click={addFriend}
+            class="rounded-xl px-4 py-2 font-medium bg-[#142833] hover:bg-[#1A3240] text-pirate-parchment transition"
+            disabled={!newFriendName.trim()}
+          >
+            Add
+          </button>
+        </div>
+        {#if formFriends.length > 0}
+          <div class="space-y-1">
+            {#each formFriends as friend}
+              <div class="flex items-center justify-between bg-black/25 rounded-lg px-3 py-2 border border-white/10">
+                <span class="text-white">{friend}</span>
+                <button
+                  type="button"
+                  on:click={() => removeFriend(friend)}
+                  class="text-[#FF4444] hover:text-[#FF6666] transition"
+                  aria-label="Remove {friend}"
+                >
+                  ✕
+                </button>
+              </div>
+            {/each}
+          </div>
+        {/if}
       </div>
     </div>
 

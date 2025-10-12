@@ -18,6 +18,10 @@
 .text-pirate-parchment { color: var(--pirate-parchment); }
 .text-pirate-muted { color: var(--pirate-muted); }
 .bg-pirate-gold\/90 { background-color: color-mix(in oklab, var(--pirate-gold) 90%, transparent); }
+.bg-pirate-gold { background-color: var(--pirate-gold); }
+.border-pirate-gold { border-color: var(--pirate-gold); }
+.ring-pirate-gold { --tw-ring-color: var(--pirate-gold); }
+.shadow-pirate-gold { box-shadow: 0 10px 15px -3px rgba(212, 175, 55, 0.5), 0 4px 6px -4px rgba(212, 175, 55, 0.5); }
 
 /* Fallback if color-mix unsupported */
 @supports not (background-color: color-mix(in oklab, white, black)) {
