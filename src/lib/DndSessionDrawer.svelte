@@ -24,11 +24,19 @@
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
-  function handleAvailabilitySubmit() {
+  async function handleAvailabilitySubmit() {
     if (!playerName || !availability || !selectedDate) return;
     
     const date = formatDate(selectedDate);
-    playerAvailability.add({
+    
+    // Remove any existing entry for this friend on this date
+    const existingEntry = dayAvailabilities.find(a => a.playerName === playerName);
+    if (existingEntry) {
+      await playerAvailability.remove(existingEntry.id);
+    }
+    
+    // Add the new entry
+    await playerAvailability.add({
       date,
       playerName,
       canPlay: availability === 'can' ? true : availability === 'cannot' ? false : 'tentative'

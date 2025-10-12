@@ -122,7 +122,7 @@
         </div>
 
         <!-- Calendar Days -->
-        <div class="grid grid-cols-7 gap-1">
+        <div class="grid grid-cols-7 gap-2">
           {#each calendarDays as day, i}
             {#if day !== null}
               {@const date = formatDate(new Date(year, month, day))}
@@ -130,11 +130,17 @@
               {@const dayData = $dndDays.find((d: DndDay) => d.date === date)}
               {@const isDndDayMarked = dayData?.isDndDay || false}
               {@const isTentativeDay = dayData?.isTentative || false}
-              {@const canPlayCount = dayPlayers.filter((p: PlayerAvailability) => p.canPlay === true).length}
-              {@const cannotPlayCount = dayPlayers.filter((p: PlayerAvailability) => p.canPlay === false).length}
-              {@const tentativeCount = dayPlayers.filter((p: PlayerAvailability) => p.canPlay === 'tentative').length}
+              {@const canPlayPlayers = dayPlayers.filter((p: PlayerAvailability) => p.canPlay === true)}
+              {@const cannotPlayPlayers = dayPlayers.filter((p: PlayerAvailability) => p.canPlay === false)}
+              {@const tentativePlayers = dayPlayers.filter((p: PlayerAvailability) => p.canPlay === 'tentative')}
+              {@const canPlayCount = canPlayPlayers.length}
+              {@const cannotPlayCount = cannotPlayPlayers.length}
+              {@const tentativeCount = tentativePlayers.length}
+              {@const totalFriends = person?.friends?.length || 0}
+              {@const totalResponses = dayPlayers.length}
+              {@const allFriendsAvailable = totalFriends > 0 && canPlayCount === totalFriends}
               <button 
-                class="aspect-square p-1 rounded-lg {isToday(day) ? 'bg-[#142833]' : 'bg-[#142833]/50'} {isDndDayMarked ? 'ring-2 ring-pirate-gold' : isTentativeDay ? 'ring-2 ring-pink-500' : ''} hover:bg-[#1A3240] text-pirate-parchment transition flex flex-col relative focus:outline-none focus:ring-2 focus:ring-pirate-gold/60"
+                class="aspect-square p-1 rounded-lg {allFriendsAvailable ? 'bg-green-400/20' : isToday(day) ? 'bg-[#142833]' : 'bg-[#142833]/50'} {isDndDayMarked ? 'ring-2 ring-pirate-gold' : isTentativeDay ? 'ring-2 ring-pink-500' : allFriendsAvailable ? 'ring-2 ring-green-400' : ''} hover:bg-[#1A3240] text-pirate-parchment transition flex flex-col relative focus:outline-none focus:ring-2 focus:ring-pirate-gold/60"
                 on:click={() => handleDayClick(day)}
                 tabindex="0"
                 on:keydown={e => {
@@ -144,7 +150,7 @@
                   }
                 }}
               >
-                <span class="text-sm font-medium mb-0.5">{day}</span>
+                <span class="text-sm font-medium mb-0.5 relative z-10">{day}</span>
                 <div class="flex-1 overflow-hidden text-left">
                   <!-- Desktop: Show names -->
                   <div class="hidden md:block">
