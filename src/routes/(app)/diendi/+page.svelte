@@ -161,7 +161,7 @@
                     {/each}
                   </div>
                   <!-- Mobile: Show counts -->
-                  <div class="md:hidden flex gap-1 text-[0.65rem] font-semibold">
+                  <div class="md:hidden flex gap-0.5 text-[0.5rem] font-bold leading-none">
                     {#if canPlayCount > 0}
                       <span class="text-green-400">✓{canPlayCount}</span>
                     {/if}

@@ -94,11 +94,16 @@
   }
 
   // Save D&D day status when toggle changes
-  $: if (selectedDate && isDndDay) {
+  $: if (selectedDate) {
     const date = formatDate(selectedDate);
-    // If marking as D&D day, clear tentative
-    isTentative = false;
-    dndDays.setDndDay(date, isDndDay, false);
+    if (isDndDay) {
+      // If marking as D&D day, clear tentative
+      isTentative = false;
+      dndDays.setDndDay(date, isDndDay, false);
+    } else {
+      // If unmarking as D&D day, update with current tentative state
+      dndDays.setDndDay(date, false, isTentative);
+    }
   }
 
   // Get player availabilities for selected date

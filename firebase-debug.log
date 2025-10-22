@@ -1,0 +1,66 @@
+[debug] [2025-10-12T20:45:34.856Z] ----------------------------------------------------------------------
+[debug] [2025-10-12T20:45:34.857Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy
+[debug] [2025-10-12T20:45:34.857Z] CLI Version:   14.16.0
+[debug] [2025-10-12T20:45:34.857Z] Platform:      darwin
+[debug] [2025-10-12T20:45:34.857Z] Node Version:  v20.19.0
+[debug] [2025-10-12T20:45:34.857Z] Time:          Sun Oct 12 2025 22:45:34 GMT+0200 (Central European Summer Time)
+[debug] [2025-10-12T20:45:34.857Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-10-12T20:45:34.922Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-10-12T20:45:34.923Z] > authorizing via signed-in user (ggiuglio2001@gmail.com)
+[debug] [2025-10-12T20:45:34.923Z] [iam] checking project book-a-la for permissions ["firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update"]
+[debug] [2025-10-12T20:45:34.923Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:45:34.923Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:45:34.923Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions [none]
+[debug] [2025-10-12T20:45:34.923Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions x-goog-quota-user=projects/book-a-la
+[debug] [2025-10-12T20:45:34.924Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions {"permissions":["firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update"]}
+[debug] [2025-10-12T20:46:10.506Z] *** [apiv2] error from fetch(https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions, {"headers":{},"method":"POST","body":"{\"permissions\":[\"firebase.projects.get\",\"firebasedatabase.instances.update\",\"firebasehosting.sites.update\"]}"}): FetchError: request to https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions failed, reason: socket hang up
+[debug] [2025-10-12T20:46:10.507Z] [iam] error while checking permissions, command may fail: Failed to make request to https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions
+[debug] [2025-10-12T20:46:10.508Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:46:10.508Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:46:10.509Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/book-a-la [none]
+[debug] [2025-10-12T20:46:40.512Z] *** [apiv2] error from fetch(https://firebase.googleapis.com/v1beta1/projects/book-a-la, {"headers":{},"method":"GET","signal":{}}): AbortError: The user aborted a request.
+[debug] [2025-10-12T20:46:40.513Z] Timeout reached making request to https://firebase.googleapis.com/v1beta1/projects/book-a-la (original: The user aborted a request.)
+[debug] [2025-10-12T20:46:48.383Z] ----------------------------------------------------------------------
+[debug] [2025-10-12T20:46:48.384Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy
+[debug] [2025-10-12T20:46:48.384Z] CLI Version:   14.16.0
+[debug] [2025-10-12T20:46:48.384Z] Platform:      darwin
+[debug] [2025-10-12T20:46:48.385Z] Node Version:  v20.19.0
+[debug] [2025-10-12T20:46:48.385Z] Time:          Sun Oct 12 2025 22:46:48 GMT+0200 (Central European Summer Time)
+[debug] [2025-10-12T20:46:48.385Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-10-12T20:46:48.450Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-10-12T20:46:48.450Z] > authorizing via signed-in user (ggiuglio2001@gmail.com)
+[debug] [2025-10-12T20:46:48.451Z] [iam] checking project book-a-la for permissions ["firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update"]
+[debug] [2025-10-12T20:46:48.451Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:46:48.451Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:46:48.451Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions [none]
+[debug] [2025-10-12T20:46:48.451Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions x-goog-quota-user=projects/book-a-la
+[debug] [2025-10-12T20:46:48.452Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions {"permissions":["firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update"]}
+[debug] [2025-10-12T20:47:00.291Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions 200
+[debug] [2025-10-12T20:47:00.292Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/book-a-la:testIamPermissions {"permissions":["firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update"]}
+[debug] [2025-10-12T20:47:00.293Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:47:00.294Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:47:00.294Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/book-a-la [none]
+[debug] [2025-10-12T20:47:06.212Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/book-a-la 200
+[debug] [2025-10-12T20:47:06.212Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/book-a-la {"projectId":"book-a-la","projectNumber":"247319462728","displayName":"Book-a-Lame","name":"projects/book-a-la","resources":{"hostingSite":"book-a-la","realtimeDatabaseInstance":"book-a-la-default-rtdb"},"state":"ACTIVE","etag":"1_bd7afef2-bab5-40dd-90a2-9451056d1f9e"}
+[debug] [2025-10-12T20:47:06.214Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:47:06.214Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:47:06.214Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/book-a-la [none]
+[debug] [2025-10-12T20:47:07.167Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/book-a-la 200
+[debug] [2025-10-12T20:47:07.168Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/book-a-la {"projectId":"book-a-la","projectNumber":"247319462728","displayName":"Book-a-Lame","name":"projects/book-a-la","resources":{"hostingSite":"book-a-la","realtimeDatabaseInstance":"book-a-la-default-rtdb"},"state":"ACTIVE","etag":"1_bd7afef2-bab5-40dd-90a2-9451056d1f9e"}
+[info] 
+[info] === Deploying to 'book-a-la'...
+[info] 
+[info] i  deploying database, hosting 
+[info] i  database: checking rules syntax... 
+[debug] [2025-10-12T20:47:07.175Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:47:07.175Z] Checked if tokens are valid: true, expires at: 1760303608555
+[debug] [2025-10-12T20:47:07.176Z] >>> [apiv2][query] GET https://firebasedatabase.googleapis.com/v1beta/projects/book-a-la/locations/-/instances/book-a-la-default-rtdb [none]
+[debug] [2025-10-12T20:47:17.179Z] *** [apiv2] error from fetch(https://firebasedatabase.googleapis.com/v1beta/projects/book-a-la/locations/-/instances/book-a-la-default-rtdb, {"headers":{},"method":"GET","signal":{}}): AbortError: The user aborted a request.
+[debug] [2025-10-12T20:47:17.179Z] Timeout reached making request to https://firebasedatabase.googleapis.com/v1beta/projects/book-a-la/locations/-/instances/book-a-la-default-rtdb
+[debug] [2025-10-12T20:47:17.674Z] FirebaseError: Timeout reached making request to https://firebasedatabase.googleapis.com/v1beta/projects/book-a-la/locations/-/instances/book-a-la-default-rtdb
+    at RetryOperation._fn (/usr/local/lib/node_modules/firebase-tools/lib/apiv2.js:257:35)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[error] 
+[error] Error: Failed to get instance details for instance: book-a-la-default-rtdb. See firebase-debug.log for more details.
